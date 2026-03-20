@@ -1,0 +1,1004 @@
+Why We Need Design Principles in Software Development
+Design principles are fundamental guidelines that help developers create better software. Here's why they're essential:
+1. Maintainability
+• Makes code easier to understand, modify, and extend
+• Reduces technical debt over time
+• Enables new team members to work with the codebase quickly
+2. Scalability
+• Allows systems to grow without complete rewrites
+• Prevents performance degradation as features are added
+• Accommodates increasing user loads and data volumes
+3. Reliability
+• Reduces bugs and system failures
+• Makes testing easier and more effective
+• Ensures consistent behavior across different scenarios
+4. Cost Efficiency
+• Saves time and money in the long run
+• Reduces debugging and maintenance efforts
+• Minimizes rework and refactoring needs
+5. Team Collaboration
+• Provides a common vocabulary for developers
+• Creates consistent coding patterns
+• Facilitates code reviews and knowledge sharing
+
+
+Software Design Principles Explained Simply
+Let me explain each principle with easy-to-understand definitions and examples.
+
+1. SOLID Principles (5 Core OOP Principles)
+S - Single Responsibility
+Simple Definition: A class/module should have only ONE job to do.
+Example:
+• ❌ Bad: A User class that handles database, sends emails, and generates reports
+• ✅ Good: Separate classes for UserDatabase, UserEmailService, and UserReportGenerator
+O - Open/Closed
+Simple Definition: You should be able to add new features without changing existing code.
+Example:
+• Instead of modifying a PaymentProcessor class for each new payment method, create new payment method classes that extend it
+L - Liskov Substitution
+Simple Definition: Child classes should be usable anywhere their parent class is used, without breaking anything.
+Example:
+• If you have a Bird class with a fly() method, a Penguin subclass shouldn't inherit it (penguins can't fly). Better to separate flying birds from non-flying birds.
+// ❌ BAD: Child breaks parent behavior
+class Bird {
+  fly() { return "flying"; }
+}
+class Penguin extends Bird {
+  fly() { throw new Error("Can't fly"); } // Breaks substitution
+}
+
+// ✅ GOOD: Proper abstraction
+interface Flyable {
+  fly(): string;
+}
+interface Swimmable {
+  swim(): string;
+}
+class Eagle implements Flyable {
+  fly() { return "flying"; }
+}
+class Penguin implements Swimmable {
+  swim() { return "swimming"; }
+}
+
+I - Interface Segregation
+Simple Definition: Don't force classes to implement methods they don't need.
+Example:
+• ❌ Bad: One Worker interface with work(), eat(), sleep() methods for all workers
+• ✅ Good: Separate interfaces: Workable, Eatable, Sleepable. A robot can implement only Workable
+D - Dependency Inversion
+Simple Definition: Depend on abstract concepts, not concrete implementations.
+Example:
+• A Switch should depend on the abstract concept of a Device, not a concrete LightBulb class. This way the switch can control fans, TVs, etc.
+
+2. DRY - Don't Repeat Yourself
+Simple Definition: Every piece of knowledge should have a single, unambiguous representation in your system.
+Real-life Analogy: Instead of writing your phone number on 10 sticky notes, write it once and make copies.
+Example:
+• ❌ Bad: Same validation logic copy-pasted in 5 different files
+• ✅ Good: Create one validateEmail() function and call it everywhere
+
+3. YAGNI - You Ain't Gonna Need It
+Simple Definition: Don't add functionality until you actually need it.
+Real-life Analogy: Don't buy winter clothes in summer just because you might need them later.
+Example:
+• ❌ Bad: Adding complex caching system "just in case" the app gets millions of users
+• ✅ Good: Start simple, add caching only when you actually have performance issues
+
+4. Favor Composition Over Inheritance
+Simple Definition: It's often better to combine small, independent parts than to create complex family trees of classes.
+Real-life Analogy: Building with LEGO blocks (composition) vs. carving from a single block of wood (inheritance)
+Example:
+// ❌ BAD: Deep inheritance
+class Vehicle {
+  drive() {}
+}
+class FlyingCar extends Vehicle {
+  fly() {}
+}
+// What about FlyingBoat? SwimmingCar? Gets messy!
+
+// ✅ GOOD: Composition
+interface Drivable { drive(): void; }
+interface Flyable { fly(): void; }
+interface Floatable { float(): void; }
+
+class Car implements Drivable {
+  drive() { console.log("Driving"); }
+}
+
+class FlyingCar implements Drivable, Flyable {
+  drive() { console.log("Driving"); }
+  fly() { console.log("Flying"); }
+}
+
+class AmphibiousCar implements Drivable, Floatable {
+  drive() { console.log("Driving"); }
+  float() { console.log("Floating"); }
+}
+
+5. SoC - Separation of Concerns
+Simple Definition: Break your application into distinct sections, each handling a specific responsibility.
+Real-life Analogy: A restaurant has different sections: kitchen (cooking), front desk (seating), waiters (serving). Each focuses on its own job.
+Example:
+• MVC Pattern: Model (data), View (UI), Controller (logic)
+• Frontend vs Backend separation
+• Database queries separate from business logic
+
+6. Encapsulate What Varies
+Simple Definition: Identify what changes in your system and hide it behind a stable interface.
+Real-life Analogy: The electrical outlet (stable interface) hides the varying voltage and wiring behind your wall.
+Example:
+python
+# ❌ Bad - variation exposed everywhere
+def process_payment(type, amount):
+    if type == "credit": ...
+    elif type == "paypal": ...
+    # New payment types require modifying this method
+# ✅ Good - variation encapsulated
+class PaymentProcessor:
+    def process(self, amount):
+        pass  # Interface stays same
+class CreditCardProcessor(PaymentProcessor):
+    def process(self, amount):
+        # Credit card specific logic
+class PayPalProcessor(PaymentProcessor):
+    def process(self, amount):
+        # PayPal specific logic
+
+7. Cohesion
+Simple Definition: How closely related and focused are the responsibilities of a single module/class?
+Real-life Analogy:
+• High Cohesion (good): A Swiss Army knife with a blade, corkscrew, and scissors (all related to cutting/opening)
+• Low Cohesion (bad): A tool that combines a knife, a calculator, and a coffee maker (unrelated functions)
+Example:
+• High Cohesion: UserAuthentication class with methods like login(), logout(), resetPassword() (all authentication-related)
+• Low Cohesion: UserUtility class with methods like login(), sendEmail(), calculateTax() (unrelated functions)
+// ❌ LOW COHESION (BAD) - Unrelated things together
+class UserUtils {
+  login() {}           // auth related
+  sendEmail() {}       // email related
+  calculateTax() {}    // finance related
+  generatePDF() {}     // report related
+}
+
+// ✅ HIGH COHESION (GOOD) - Related things together
+class UserAuthentication {
+  login() {}
+  logout() {}
+  resetPassword() {}
+  changePassword() {}
+}
+
+class UserEmail {
+  sendWelcome() {}
+  sendNewsletter() {}
+  sendNotification() {}
+}
+
+class UserReport {
+  generatePDF() {}
+  generateCSV() {}
+  generateJSON() {}
+}
+
+
+8. Coupling
+Simple Definition: How dependent are different modules on each other?
+Real-life Analogy:
+• Tight Coupling (bad): Two dancers tied together with rope - if one falls, both fall
+• Loose Coupling (good): Two dancers performing together but independently - if one stumbles, the other adapts
+Example:
+python
+# ❌ Tight Coupling - Class A directly creates and depends on Class B
+class EmailService:
+    def send(self):
+        smtp = SMTPConnection()  # Direct creation
+        smtp.connect()
+# ✅ Loose Coupling - Depend on abstraction
+class EmailService:
+    def __init__(self, connection):
+        self.connection = connection  # Injected from outside
+
+    def send(self):
+        self.connection.connect()
+
+Quick Reference Table
+Principle	Core Idea	Question to Ask
+S (SOLID)	One job per class	"Does this class have multiple reasons to change?"
+O (SOLID)	Extend, don't modify	"Can I add features without editing existing code?"
+L (SOLID)	Substitutes must work	"Can I replace parent with child without breaking?"
+I (SOLID)	Don't force unnecessary methods	"Are any methods here irrelevant to some classes?"
+D (SOLID)	Depend on abstractions	"Does this depend on concrete details or concepts?"
+DRY	Don't repeat code	"Have I written this logic before?"
+YAGNI	Don't over-engineer	"Do I need this right now?"
+Composition	Combine, don't inherit	"Can I build this from smaller parts?"
+SoC	Separate responsibilities	"Is this mixing different concerns?"
+Encapsulate Variation	Hide what changes	"What parts might change in the future?"
+Cohesion	Keep related things together	"Do these methods belong together?"
+Coupling	Reduce dependencies	"How much does this break if that changes?"
+These principles work together like tools in a toolbox - you don't need to use all of them all the time, but knowing when to apply each one makes you a better developer!
+
+
+Interface Segregation Principle (ISP) - SOLID Principles
+Program to interface, not an implementation
+
+ Simple Definition
+"Don't force classes to implement methods they don't need"
+Think of it like a restaurant menu:
+• A good restaurant has separate menus (breakfast, lunch, dinner)
+• You don't want to see dinner options when ordering breakfast
+• Similarly, interfaces should be specific to what the client needs
+
+Problem Scenario
+Imagine forcing everyone to implement everything:
+typescript
+// ❌ BAD - Fat interface (like one menu for everything)
+interface Worker {
+  work(): void;
+  eat(): void;
+  sleep(): void;
+  code(): void;
+  design(): void;
+}
+class Robot implements Worker {
+  work() { console.log("Working..."); }
+  eat() { throw new Error("Robots don't eat!"); }  // ❌ Forced to implement
+  sleep() { throw new Error("Robots don't sleep!"); } // ❌ Forced to implement
+  code() { console.log("Coding..."); }
+  design() { throw new Error("Can't design"); } // ❌ Forced to implement
+}
+
+
+// ===== INTERFACES (What to do) =====
+interface Workable {
+  work(): void;
+}
+
+interface Eatable {
+  eat(): void;
+}
+
+	interface Sleepable {
+	  sleep(): void;
+	}
+
+interface Coder {
+  code(): void;
+}
+
+// ===== IMPLEMENTATIONS (How to do it) =====
+
+// Human needs all basic functions
+class Human implements Workable, Eatable, Sleepable, Coder {
+  work() {
+    console.log("👨‍💻 Human working...");
+  }
+
+  eat() {
+    console.log("🍔 Human eating...");
+  }
+
+  sleep() {
+    console.log("😴 Human sleeping...");
+  }
+
+  code() {
+    console.log("💻 Human coding...");
+  }
+}
+
+// Robot only needs work and code
+class DeveloperRobot implements Workable, Coder {
+  work() {
+    console.log("🤖 Robot working...");
+  }
+
+  code() {
+    console.log("🤖 Robot coding 24/7...");
+  }
+}
+
+// Simple worker only needs to work
+class SimpleWorker implements Workable {
+  work() {
+    console.log("👷 Worker doing simple tasks...");
+  }
+}
+
+// ===== USAGE =====
+const human = new Human();
+const robot = new DeveloperRobot();
+const worker = new SimpleWorker();
+
+// Each only has methods they actually need
+human.work();    // ✅ Works
+human.eat();     // ✅ Works
+human.code();    // ✅ Works
+
+robot.work();    // ✅ Works
+robot.code();    // ✅ Works
+// robot.eat();  // ❌ Error - Robot doesn't have eat()
+
+worker.work();   // ✅ Works
+// worker.code(); // ❌ Error - Worker doesn't have code()
+
+
+
+Favor Composition Over Inheritance
+📚 Simple Definition
+"Has-a is better than Is-a"
+Think of it like building with LEGO blocks:
+• Inheritance = Pre-built plastic model (fixed, can't change parts easily)
+• Composition = LEGO bricks (mix and match any pieces you want)
+
+
+solid principles
+
+Letter	Principle	Simple Definition
+S	Single Responsibility Principle	One class, one job
+O	Open/Closed Principle	Open for extension, closed for modification
+L	Liskov Substitution Principle	Child classes should work where parent works
+I	Interface Segregation Principle	Don't force classes to implement what they don't use
+D	Dependency Inversion Principle	Depend on abstractions, not concrete classes
+
+
+
+SRP
+
+The Single Responsibility Principle (SRP) in TypeScript states that a class, module, or function should have only one well-defined job and, as a result, only one reason to change.
+ 2. THE PROBLEM (What We Fixed)
+❌ Before SRP - One Class Does Everything
+typescript
+class OrderProcessor {
+  // Data + Calculation + Database + Email + Validation + Logging
+
+  constructor() {}  // Too many responsibilities!
+
+  calculateTotal() { }     // 📊 Calculation
+  saveToDatabase() { }     // 💾 Database
+  sendEmail() { }          // 📧 Email
+  validateOrder() { }      // ✅ Validation
+  logActivity() { }        // 📝 Logging
+}
+Problems:
+• Hard to change (modifying email affects orders)
+• Hard to test (need database, email, etc. to test)
+• Code duplication (can't reuse email logic elsewhere)
+• Many reasons to change = many bugs
+
+✅ 3. THE SOLUTION (What We Built)
+After SRP - Each Class Has ONE Job
+text
+┌─────────────────────────────────────┐
+│         ORDER SYSTEM (SRP)          │
+├─────────────────────────────────────┤
+│                                     │
+│  ┌─────────────┐                    │
+│  │    Order    │  ◄── Data ONLY      │
+│  │  (Entity)   │                     │
+│  └─────────────┘                      │
+│         │                             │
+│         │ Uses                        │
+│    ┌────┴────┬────┬────┬────┐        │
+│    ↓         ↓    ↓    ↓    ↓         │
+│ ┌──────┐ ┌────┐ ┌───┐ ┌───┐ ┌───┐   │
+│ │Order │ │Email│ │Val-│ │Log-│ │Cal-│   │
+│ │Repo  │ │Serv-│ │ida-│ │ger │ │cu- │   │
+│ │(DB)  │ │ice  │ │tor │ │    │ │la- │   │
+│ └──────┘ └────┘ └───┘ └───┘ └───┘   │
+│   DB       Email   Validate Log   Calculate│
+│   ONLY     ONLY    ONLY    ONLY    ONLY   │
+└─────────────────────────────────────┘
+
+📦 4. OUR SRP-COMPLIANT CLASSES
+Class 1: Order Entity (Only stores data)
+typescript
+class Order {
+  constructor(
+    public orderId: string,
+    public customerEmail: string,
+    public items: Item[],
+    public total: number
+  ) {}
+  // Related calculation is OK (operates on its own data)
+  calculateTotal() {
+    this.total = this.items.reduce((sum, item) => sum + item.price, 0);
+  }
+}
+Class 2: OrderRepository (Only database)
+typescript
+class OrderRepository {
+  save(order: Order) {
+    console.log(`Saving order ${order.orderId} to DB`);
+  }
+
+  cancel(orderId: string) {
+    console.log(`Cancelling order ${orderId}`);
+  }
+}
+Class 3: EmailService (Only emails)
+typescript
+class EmailService {
+  sendConfirmation(order: Order) {
+    console.log(`Email sent to ${order.customerEmail}`);
+  }
+}
+Class 4: OrderValidator (Only validation)
+typescript
+class OrderValidator {
+  validate(order: Order): boolean {
+    if (order.items.length === 0) return false;
+    if (!order.customerEmail.includes('@')) return false;
+    return true;
+  }
+}
+Class 5: Logger (Only logging)
+typescript
+class Logger {
+  log(message: string) {
+    console.log(`[${new Date().toISOString()}] ${message}`);
+  }
+}
+Class 6: OrderService (Orchestrator)
+typescript
+class OrderService {
+  constructor(
+    private repo: OrderRepository,
+    private email: EmailService,
+    private validator: OrderValidator,
+    private logger: Logger
+  ) {}
+  createOrder(orderData: any) {
+    // Coordinates the work, doesn't do the work itself
+    const order = new Order(...orderData);
+    order.calculateTotal();
+
+    if (!this.validator.validate(order)) {
+      this.logger.log("Invalid order");
+      throw new Error("Invalid order");
+    }
+
+    this.repo.save(order);
+    this.email.sendConfirmation(order);
+    this.logger.log(`Order ${order.orderId} created`);
+
+    return order;
+  }
+}
+
+🔍 5. WHY THIS IS BETTER
+Aspect	Before SRP	After SRP
+Changes	Modify one class affects everything	Change ONLY the relevant class
+Testing	Need DB, email setup	Mock dependencies, test in isolation
+Reusability	Can't reuse email logic	EmailService usable anywhere
+Understanding	One huge complex class	Small, focused, easy to read
+Team Work	One developer blocks others	Multiple devs work simultaneously
+
+🎯 6. HOW TO IDENTIFY SRP VIOLATIONS
+Ask these questions about your class:
+1. ❓ "What does this class do?" (If answer has "and" → violation)
+• ❌ "It saves orders and sends emails"
+• ✅ "It saves orders"
+2. ❓ "How many reasons to change this class?"
+• ❌ "If DB changes OR email format changes OR validation rules change"
+• ✅ "Only if DB changes"
+3. ❓ "Can I describe it in 5 words?"
+• ❌ "Manages orders, emails, validation, logging"
+• ✅ "Stores order data" or "Sends emails"
+
+
+
+ OPEN-CLOSED PRINCIPLE (OCP) - The "O" in SOLID
+Simple Definition
+"Open for extension, Closed for modification"
+Meaning:
+• ✅ OPEN = You can add NEW functionality
+• ❌ CLOSED = You DON'T change existing code
+
+🎯 Real-Life Analogy
+Think of a USB Port:
+text
+┌─────────────────────────────────────┐
+│            COMPUTER                  │
+│  ┌─────────────────────────────┐    │
+│  │                             │    │
+│  │    USB PORT (INTERFACE)     │    │
+│  │    ┌──────────────────┐    │    │
+│  │    │                  │    │    │
+│  └────┼──────────────────┼────┘    │
+│       │                  │         │
+│       ↓                  ↓         │
+│  ┌─────────┐        ┌─────────┐    │
+│  │ MOUSE   │        │ KEYBOARD│    │
+│  └─────────┘        └─────────┘    │
+│                                      │
+│  NEW DEVICES? Just plug them in!    │
+│  - Printer                           │
+│  - Flash drive                        │
+│  - Phone                             │
+└─────────────────────────────────────┘
+🔌 USB Port = CLOSED for modification (don't change the port)
+🔌 New devices = OPEN for extension (just plug new things in)
+
+🚫 THE PROBLEM - Violating OCP
+typescript
+// ❌ BAD: Every time we add a new payment, we modify this class!
+class PaymentProcessor {
+    processPayment(type: string, amount: number) {
+        if (type === 'credit') {
+            // Credit card logic
+            console.log(`Processing credit card payment: $${amount}`);
+            console.log("Validating CVV...");
+            console.log("Charging card...");
+        }
+        else if (type === 'paypal') {
+            // PayPal logic
+            console.log(`Processing PayPal payment: $${amount}`);
+            console.log("Redirecting to PayPal...");
+            console.log("Completing payment...");
+        }
+        // ❌ PROBLEM: Need to modify this class to add:
+        else if (type === 'bitcoin') {
+            // Have to add NEW code HERE!
+            console.log(`Processing Bitcoin payment: $${amount}`);
+        }
+        else if (type === 'giftcard') {
+            // Have to add MORE code HERE!
+            console.log(`Processing gift card payment: $${amount}`);
+        }
+    }
+}
+// Every new payment method = modify existing code!
+// This is BAD - might break existing payments
+
+✅ THE SOLUTION - Following OCP
+typescript
+// ===== STEP 1: Create an ABSTRACTION (interface) =====
+// This is our "USB port" - CLOSED for modification
+interface PaymentMethod {
+    pay(amount: number): void;
+}
+// ===== STEP 2: Implement different payment methods =====
+// These are our "USB devices" - OPEN for extension
+class CreditCardPayment implements PaymentMethod {
+    private cardNumber: string;
+    private cvv: string;
+
+    constructor(cardNumber: string, cvv: string) {
+        this.cardNumber = cardNumber;
+        this.cvv = cvv;
+    }
+
+    pay(amount: number): void {
+        console.log(`💳 Credit Card: $${amount}`);
+        console.log(`   Card: ${this.cardNumber.slice(-4)}`);
+        console.log(`   Validating CVV...`);
+        console.log(`   Payment approved!`);
+    }
+}
+class PayPalPayment implements PaymentMethod {
+    private email: string;
+
+    constructor(email: string) {
+        this.email = email;
+    }
+
+    pay(amount: number): void {
+        console.log(`🅿️ PayPal: $${amount}`);
+        console.log(`   Account: ${this.email}`);
+        console.log(`   Redirecting to PayPal...`);
+        console.log(`   Payment complete!`);
+    }
+}
+// ✅ EASY TO EXTEND - Just add new classes!
+// NO modification of existing code needed!
+class BitcoinPayment implements PaymentMethod {
+    private walletAddress: string;
+
+    constructor(walletAddress: string) {
+        this.walletAddress = walletAddress;
+    }
+
+    pay(amount: number): void {
+        console.log(`₿ Bitcoin: $${amount}`);
+        console.log(`   Wallet: ${this.walletAddress.slice(0, 6)}...`);
+        console.log(`   Blockchain transaction initiated...`);
+        console.log(`   Payment confirmed!`);
+    }
+}
+class GiftCardPayment implements PaymentMethod {
+    private code: string;
+
+    constructor(code: string) {
+        this.code = code;
+    }
+
+    pay(amount: number): void {
+        console.log(`🎁 Gift Card: $${amount}`);
+        console.log(`   Code: ${this.code}`);
+        console.log(`   Balance deducted!`);
+    }
+}
+// ===== STEP 3: Payment processor that's CLOSED for modification =====
+class PaymentProcessor {
+    // This class NEVER changes when we add new payments!
+    processPayment(paymentMethod: PaymentMethod, amount: number) {
+        console.log("\n🔄 Processing payment...");
+        paymentMethod.pay(amount);
+        console.log("✅ Payment completed!\n");
+    }
+}
+// ===== USAGE =====
+const processor = new PaymentProcessor();
+// Process different payments WITHOUT changing PaymentProcessor
+processor.processPayment(new CreditCardPayment("1234-5678-9012-3456", "123"), 100);
+processor.processPayment(new PayPalPayment("user@email.com"), 50);
+processor.processPayment(new BitcoinPayment("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"), 200);
+processor.processPayment(new GiftCardPayment("GIFT-2024-ABC"), 75);
+
+
+
+
+
+
+
+LISKOV SUBSTITUTION PRINCIPLE
+
+"If S is a subtype of T, then objects of type T may be replaced with objects of type S without altering any of the desirable properties of the program."
+
+OR
+"Child classes should be usable anywhere the parent class is used, without breaking the program."
+
+OR
+"A child should be able to do everything the parent can do."
+
+. The "Ultra Easy" Definition
+Imagine you have a TV Remote. The "contract" of a remote is: If I press the Power button, the TV toggles on or off.
+Now, imagine you buy a "Fancy Eco-Remote" (a subclass). You try to use it, but when you press Power, it pops up a message saying: "Error: Please clap your hands to turn on the TV."
+That breaks the Liskov Substitution Principle. LSP simply means: A "Child" should never surprise the user of the "Parent." If you swap the original for the child, the app shouldn't even notice a difference.
+1. The "Behavioral Contract" (The Ultra-Easy Rule)
+Think of a Parent class as a Promise.
+	• Parent: "I promise that if you call move(), I will change coordinates."
+	• Child: "I am a child of Parent, but if you call move(), I will throw an error because I am stationary."
+The Child just broke a promise. That is an LSP violation. To have confidence, the Child must honor every single promise the Parent made.
+
+2. How to get "Confidence" (The Substitution Test)
+If you are writing a Child class and you feel unsure, ask yourself these 3 Questions:
+Question	If the answer is YES...
+Did I throw an error in a method that the Parent says should work?	❌ Violation
+Did I return a null when the Parent promised a string?	❌ Violation
+Did I add a "Requirement" (like a password) to a method that the Parent didn't have?	❌ Violation
+
+3. Let's Build Confidence with a "Payment" Example
+Imagine you're building a checkout system.
+The "Unconfident" Way (Violating LSP)
+You create a CreditCard and then try to create PayPal. But PayPal requires a redirect URL, which the parent doesn't mention.
+TypeScript
+
+class PaymentProcessor {
+  process(amount: number) {
+    console.log(`Processing $${amount}`);
+  }
+}
+class PayPal extends PaymentProcessor {
+  // OH NO: PayPal needs a 'userEmail' to work.
+  // The parent 'process' only takes 'amount'.
+  process(amount: number, userEmail?: string) {
+    if (!userEmail) {
+      throw new Error("I need an email!"); // BOOM! LSP Broken.
+    }
+    console.log(`Processing $${amount} for ${userEmail}`);
+  }
+}
+// WHY THIS IS SCARY:
+function checkout(processor: PaymentProcessor) {
+  // I have NO confidence this will work.
+  // If 'processor' is PayPal, it crashes because I didn't provide an email.
+  processor.process(100);
+}
+The "Confident" Way (Following LSP)
+If the Child needs something different to work, don't force it into the same shape. Use a constructor or a specific interface.
+TypeScript
+
+interface IPayment {
+  process(amount: number): void;
+}
+class CreditCard implements IPayment {
+  process(amount: number) {
+    console.log("Charging Card...");
+  }
+}
+class PayPal implements IPayment {
+  // We provide the email in the CONSTRUCTOR, not the method.
+  // Now the 'process' method matches the parent EXACTLY.
+  constructor(private email: string) {}
+process(amount: number) {
+    console.log(`Charging ${this.email}...`);
+  }
+}
+// CONFIDENCE RESTORED:
+function checkout(payment: IPayment) {
+  // I don't care if it's PayPal or Card.
+  // I know 'process(100)' will work EVERY TIME.
+  payment.process(100);
+}
+
+Let’s look at an example involving Data Storage. This is a classic scenario where developers accidentally break LSP by trying to make "Cloud Storage" and "Local Storage" do the same thing.
+The Scenario: A "Document Manager"
+Imagine you are building a system to save documents. Some documents go to a Local Disk, and some go to Read-Only Amazon S3 Buckets.
+
+1. Breaking LSP (The "Dishonest" Child)
+If the parent class Storage promises that every child can "Save" and "Delete," but our ReadOnlyCloudStorage can't delete anything, we have a problem.
+TypeScript
+
+class DataStorage {
+  save(data: string) { console.log("Saved data"); }
+  delete() { console.log("Deleted data"); }
+}
+class LocalFileSystem extends DataStorage {
+  // Works fine. Can save and delete.
+}
+class ReadOnlyS3Bucket extends DataStorage {
+  save(data: string) {
+    console.log("Saved to Cloud");
+  }
+delete() {
+    // VIOLATION: The Parent promised 'delete' works.
+    // Here, we break that promise because this bucket is Read-Only.
+    throw new Error("Cannot delete from a read-only bucket!");
+  }
+}
+// THE CRASH:
+function cleanupStorage(storage: DataStorage) {
+  // We have NO confidence. If we pass ReadOnlyS3Bucket, the app dies.
+  storage.delete();
+}
+Why this is a failure: You are forced to treat ReadOnlyS3Bucket as a "special case" in your code, which defeats the purpose of having a parent class.
+
+2. Following LSP (The "Honest" Way)
+Instead of forcing a "Read-Only" object to inherit "Delete" powers, we use Interfaces to group behaviors. Now, we only substitute things that actually fit the contract.
+TypeScript
+
+interface Readable {
+  read(): string;
+}
+interface Writable {
+  save(data: string): void;
+}
+interface Deletable {
+  delete(): void;
+}
+// Local storage can do everything
+class LocalDisk implements Readable, Writable, Deletable {
+  read() { return "data"; }
+  save(data: string) { /* ... */ }
+  delete() { /* ... */ }
+}
+// Cloud storage is honest: It can only read and save
+class ReadOnlyCloud implements Readable, Writable {
+  read() { return "cloud data"; }
+  save(data: string) { /* ... */ }
+}
+// REGAINING CONFIDENCE:
+// This function ONLY accepts things that are actually Deletable.
+function secureDelete(item: Deletable) {
+  item.delete(); // 100% Confidence. No crashes.
+}
+const myDisk = new LocalDisk();
+const myCloud = new ReadOnlyCloud();
+secureDelete(myDisk);   // Works perfectly.
+// secureDelete(myCloud); // TypeScript Error! (It's not "Deletable")
+
+3. The "Liskov Test" for your code
+Whenever you create a child class in TypeScript, perform this Mental Substitution Test:
+	1. Look at your Function: function doWork(thing: Parent) { thing.method(); }
+	2. Swap it: Put your Child class where Parent is.
+	3. The Question: Does the function still work exactly as the author expected, without adding if/else or try/catch blocks?
+	• If Yes: You have followed LSP.
+	• If No: You have a "surprise" in your child class, and you should probably use an Interface instead.
+
+
+LISKOV Example
+// Interfaces with proper naming
+interface Workable {
+    doWork(): string;
+}
+interface BonusEligible {
+    calculateBonus(): number;
+}
+interface MeetingAttendee {
+    attendMeeting(): string;
+}
+interface ReportSubmitter {
+    submitReport(): string;
+}
+// Base Employee class
+class Employee implements Workable {
+    constructor(
+        public name: string,
+        public salary: number
+    ) {}
+    doWork(): string {
+        return `${this.name} is working`;
+    }
+}
+// Developer - can do everything
+class Developer extends Employee implements BonusEligible, MeetingAttendee, ReportSubmitter {
+    constructor(name: string, salary: number) {
+        super(name, salary);
+    }
+    calculateBonus(): number {
+        return this.salary * 0.15; // 15% bonus
+    }
+    attendMeeting(): string {
+        return `${this.name} is in sprint planning`;
+    }
+    submitReport(): string {
+        return `${this.name} submitted code review report`;
+    }
+    // Inherits doWork() from Employee
+}
+// Intern - limited capabilities
+class Intern extends Employee {
+    constructor(name: string, salary: number) {
+        super(name, salary);
+    }
+    doWork(): string {
+        return `${this.name} is learning and assisting`;
+    }
+
+    // No bonus, no meetings, no reports - perfect!
+}
+// Senior Developer - gets higher bonus
+class SeniorDeveloper extends Developer {
+    calculateBonus(): number {
+        return this.salary * 0.25; // 25% bonus
+    }
+}
+// Usage
+const dev = new Developer("Raj", 100000);
+const intern = new Intern("Faraz", 10000);
+const senior = new SeniorDeveloper("Priya", 200000);
+console.log(dev.doWork());          // Raj is working
+console.log(dev.calculateBonus());  // 15000
+console.log(dev.attendMeeting());   // Raj is in sprint planning
+console.log(intern.doWork());       // Faraz is learning and assisting
+// intern.calculateBonus() // ❌ Error - doesn't exist (good!)
+console.log(senior.calculateBonus()); // 50000
+
+
+Interface Segregation Principle
+. The "Ultra Easy" Definition
+ISP says: No client should be forced to depend on methods it does not use.
+Think of a Swiss Army Knife. It’s cool, but if you only need a spoon to eat soup, you shouldn't be forced to carry around a saw, a file, and a pair of pliers just to get that spoon.
+In TypeScript: Big, fat interfaces are bad. Small, specific interfaces are good.
+
+
+This principle also reduced the coupling between two modules or the linking between two modules
+
+2. The Problem: The "Fat" Interface
+Imagine we are building an office system for Printers.
+TypeScript
+
+// BAD: A "Fat" Interface
+interface SmartMachine {
+  print(): void;
+  scan(): void;
+  fax(): void;
+}
+class SuperPrinter implements SmartMachine {
+  print() { console.log("Printing..."); }
+  scan() { console.log("Scanning..."); }
+  fax() { console.log("Faxing..."); }
+}
+class OldSchoolPrinter implements SmartMachine {
+  print() { console.log("Printing..."); }
+
+  // PROBLEM: This printer CANNOT scan or fax.
+  // We are forced to implement them anyway just to satisfy the interface.
+  scan() { throw new Error("Not supported!"); }
+  fax() { throw new Error("Not supported!"); }
+}
+Why this is bad: 1. If you change the fax() method signature in the interface, you have to update OldSchoolPrinter, even though it doesn't even use faxes! 2. It often leads to breaking LSP (throwing errors for unused methods).
+
+3. The Solution: Segregation (Splitting)
+Instead of one giant interface, we break them into small pieces. Classes only "pick" what they actually do.
+TypeScript
+
+interface Printer {
+  print(): void;
+}
+interface Scanner {
+  scan(): void;
+}
+interface FaxMachine {
+  fax(): void;
+}
+// The SuperPrinter uses "Interface Composition" (combining them)
+class SuperPrinter implements Printer, Scanner, FaxMachine {
+  print() { /* ... */ }
+  scan() { /* ... */ }
+  fax() { /* ... */ }
+}
+// The OldSchoolPrinter ONLY cares about printing
+class OldSchoolPrinter implements Printer {
+  print() { console.log("Printing..."); }
+}
+
+4. Which Problem Does It Solve?
+	• Decoupling: Changing the Scanner logic won't affect classes that only care about Printing.
+	• Readability: When you see class X implements Printer, you know exactly what it does without guessing which methods are "empty" or "fake."
+	• Maintenance: Your code becomes modular. You can mix and match behaviors like LEGO bricks.
+
+
+Dependency Inversion Principle
+
+1. The "Ultra Easy" Definition
+DIP says: High-level modules should not depend on low-level modules. Both should depend on abstractions.
+The Real-World Analogy: Think of a Wall Power Outlet.
+	• The Wall Outlet is an "Abstraction" (a standard shape).
+	• Your Lamp (High-level) doesn't care if the electricity comes from a coal plant, a wind turbine, or a battery (Low-level).
+	• As long as the plug fits the outlet, the lamp works.
+If your lamp was hard-wired directly into a specific coal power plant, you couldn't move your house! That is a dependency violation.
+
+2. The Problem: "Hard-Coded" Dependencies
+Imagine you are building a system to send notifications.
+TypeScript
+
+// LOW-LEVEL MODULE
+class EmailService {
+  sendEmail(message: string) {
+    console.log(`Sending Email: ${message}`);
+  }
+}
+// HIGH-LEVEL MODULE
+class NotificationManager {
+  private emailService: EmailService;
+constructor() {
+    // PROBLEM: NotificationManager is now STUCK with EmailService.
+    // It "Depends" on a specific low-level tool.
+    this.emailService = new EmailService();
+  }
+notify(message: string) {
+    this.emailService.sendEmail(message);
+  }
+}
+Why this is bad:
+	1. Hard to Test: You can't test NotificationManager without actually triggering real emails.
+	2. Rigid: If you want to switch to SMS or Push Notifications, you have to open the NotificationManager class and rewrite it. This violates the Open-Closed Principle!
+
+3. The Solution: Inverting the Dependency
+Instead of the Manager looking down at the Service, both look at an Interface.
+TypeScript
+
+// THE ABSTRACTION (The "Wall Outlet")
+interface MessageService {
+  send(message: string): void;
+}
+// LOW-LEVEL MODULES (The "Power Sources")
+class EmailService implements MessageService {
+  send(message: string) { console.log(`Email: ${message}`); }
+}
+class SMSService implements MessageService {
+  send(message: string) { console.log(`SMS: ${message}`); }
+}
+// HIGH-LEVEL MODULE (The "Lamp")
+class NotificationManager {
+  // It doesn't care WHAT service it is, as long as it follows the interface.
+  constructor(private service: MessageService) {}
+notify(message: string) {
+    this.service.send(message);
+  }
+}
+// EXECUTION:
+const emailSvc = new EmailService();
+const smsSvc = new SMSService();
+// We "Inject" the dependency from the outside
+const app = new NotificationManager(smsSvc);
+app.notify("Hello DIP!");
+
+4. Which Problem Does It Solve?
+	1. Decoupling: You can swap Email for SMS or WhatsApp without touching the NotificationManager code.
+	2. Testability: In a test, you can pass a "Mock" service that doesn't actually send anything.
+	3. Parallel Work: One developer can work on the NotificationManager while another builds the EmailService, as long as they agree on the Interface
